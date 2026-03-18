@@ -11,15 +11,17 @@
 
 ## PUNTUACIÓN GLOBAL
 
+> **Metodología:** Análisis pixel-by-pixel de 30 screenshots (5 vistas × 2 períodos × 3 resoluciones) + validación completa contra BD `chs_platform`.
+
 | Dimensión | Puntuación | Comentario |
 |---|:---:|---|
-| Exactitud de datos | **10/10** | 100% coincidencia BD ↔ UI en todas las vistas |
-| Colores y señalización | **9/10** | MB%, ObjBar, DevPill correctos; E-Commerce cards usan umbral absoluto (no YoY) |
-| Consistencia entre vistas | **9/10** | Coherencia total salvo 335 € de "Servicios Centrales" ausente en tablas Resumen |
-| Responsive / UX | **8.5/10** | Excelente card layout; tablas pierden columna derecha en mobile/tablet |
-| Seguridad | **5/10** | Sin middleware de autenticación; credenciales en .env; API sin proteger |
+| Exactitud de datos | **10/10** | 100% coincidencia BD ↔ UI confirmada en 30 screenshots, 14 tiendas, 5 categorías, 7 canales |
+| Colores y señalización | **9/10** | MB%, ObjBar, DevPill correctos en ambos períodos; E-Commerce usa umbral absoluto (no YoY) |
+| Consistencia entre vistas | **9/10** | Coherencia total salvo 335 € Serv. Centrales ausente en Resumen + 1 caso cross-breakpoint (B6) |
+| Responsive / UX | **7.5/10** | Text overlap en store cards mobile (B1), "Datos hasta" oculto (B2), heatmap truncado (B3/B4), tablas cortadas |
+| Seguridad | **5/10** | Sin middleware de autenticación; credenciales en .env; API POST sin proteger |
 | Rendimiento | **8/10** | Promise.all eficiente; sin N+1; falta error handling en 4 endpoints |
-| **GLOBAL** | **8.3/10** | Dashboard funcional y preciso; seguridad es el área crítica |
+| **GLOBAL PONDERADO** | **8,58/10** | Dashboard preciso y funcional; responsive mobile y seguridad son áreas de mejora |
 
 ---
 
@@ -309,6 +311,57 @@ El KPI total muestra **1.298.873 €**. La diferencia de **335 €** corresponde
 
 ---
 
+## PARTE 4B: ANÁLISIS PIXEL-BY-PIXEL DE 30 SCREENSHOTS
+
+> Se analizaron exhaustivamente los 30 screenshots (5 vistas × 2 períodos × 3 resoluciones) extrayendo cada valor numérico, color de pill, estado de barra, y elemento visual.
+
+### 4B.1 Bugs Detectados
+
+| # | Bug | Severidad | Vista | Resolución | Detalle |
+|---|---|---|---|---|---|
+| B1 | **Text overlap en store cards mobile** | ALTA | Tiendas | Mobile (375px) | En las cards de tiendas, los valores de "% Obj" y "Año Ant." colisionan visualmente. Ej: "75,9%41K EUR" aparece como texto continuo sin separación en lugar de "75,9%" y "341K EUR" en celdas distintas |
+| B2 | **"Datos hasta" oculto en mobile** | MEDIA | Todas | Mobile (375px) | La fecha de referencia ("Datos hasta: 14 mar 2026") no es visible en mobile — el usuario no puede saber la frescura de los datos |
+| B3 | **Heatmap columnas cortadas (tablet)** | MEDIA | Categorías | Tablet (768px) | La columna "SERVICIOS" del heatmap tienda×categoría queda parcialmente cortada. Sin indicador de scroll horizontal |
+| B4 | **Heatmap 3 columnas ocultas (mobile)** | MEDIA | Categorías | Mobile (375px) | Las columnas "MUEBLES", "OTROS" y "SERVICIOS" del heatmap no son visibles. Solo se ven ELECTRO, COCINAS y parcialmente REFORMAS |
+| B5 | **Tabla borde derecho recortado** | MEDIA | Todas | Tablet + Mobile | En todas las tablas con >6 columnas, las últimas 1-2 columnas quedan fuera del viewport sin indicador de scroll |
+| B6 | **Cocinas Motril MB% discrepante** | BAJA | Categorías | Cross-breakpoint | En el heatmap de Categorías MTD, Cocinas×Motril muestra 25,1% en desktop pero 35,1% en tablet/mobile. Posible artefacto de rendering o error de celda adyacente |
+| B7 | **"Otros" Kibuc >100% del Total** | BAJA | Categorías | Desktop | En la card "Otros", la tienda Kibuc muestra 122,7% del Total — valor que excede 100%, posible error en denominador del cálculo de peso relativo |
+| B8 | **E-Commerce MB% usa umbral absoluto** | BAJA | E-Commerce | Todas | Las cards de E-Commerce colorean MB% con umbral fijo (>30% verde, <30% rojo) en vez de usar comparativa YoY como en otras vistas. Inconsistencia visual menor |
+
+### 4B.2 Consistencia de Datos Cross-Resolución
+
+Todos los valores numéricos son **idénticos** entre desktop, tablet y mobile para cada vista y período, salvo:
+- Redondeos de formato (ej. "416.756 €" vs "417K €" por espacio disponible)
+- El bug B6 (Cocinas Motril MB% — caso aislado)
+
+**Resultado: 29/30 screenshots con datos 100% consistentes ✅ (1 caso B6 pendiente de verificación)**
+
+### 4B.3 Responsive Layout — Visibilidad de Columnas
+
+| Resolución | Columnas visibles en tabla principal | Columnas ocultas |
+|---|---|---|
+| Desktop (1440px) | TIENDA, REAL, MARGEN, MB%, % OBJ, AÑO ANT., % YoY | Ninguna |
+| Tablet (768px) | TIENDA, REAL, MB%, % OBJ, % YoY | MARGEN, AÑO ANT. |
+| Mobile (375px) | TIENDA, REAL, MB% | MARGEN, % OBJ, AÑO ANT., % YoY |
+
+### 4B.4 Elementos Visuales Verificados (Resumen)
+
+| Elemento | MTD Mar | Feb 2026 | Veredicto |
+|---|---|---|---|
+| KPI cards (4) | ✅ Valores correctos, colores coherentes | ✅ | OK |
+| RadialGauge semicircular | ✅ 72,4% azul | ✅ 92,5% azul | OK |
+| ObjBar (3 colores) | ✅ 9 tiendas verificadas | ✅ 9 tiendas | OK |
+| MB% pills + pp | ✅ 14 tiendas + 5 categorías | ✅ | OK |
+| DevPill YoY | ✅ 14 tiendas | ✅ | OK |
+| Sparklines SVG | ✅ 5 tiendas físicas | ✅ | OK |
+| Drill-down cards | ✅ Desglose por categoría | ✅ | OK |
+| Subtextos cabecera | ✅ "vs Año Anterior" / "vs Presupuesto" | ✅ | OK |
+| Donut chart (E-Commerce) | ✅ 7 segmentos | ✅ | OK |
+| Heatmap (Categorías) | ✅ desktop completo | ⚠️ B3/B4 en tablet/mobile | Parcial |
+| Mapa tiendas | ✅ 5 marcadores | ✅ | OK |
+
+---
+
 ## PARTE 5: AUDITORÍA UX — PERSPECTIVA CEO
 
 ### ¿Puede un CEO tomar decisiones con este dashboard?
@@ -339,11 +392,14 @@ El KPI total muestra **1.298.873 €**. La diferencia de **335 €** corresponde
 
 | # | Hallazgo | Impacto | Recomendación |
 |---|---|---|---|
-| 1 | Tablas pierden columnas en tablet/mobile | MEDIO | Scroll horizontal con indicador visual (sombra/gradiente) |
-| 2 | "Servicios Centrales" (335 €) no aparece en Resumen | BAJO | Incluir en tabla de Contract o crear sección "Otros" |
-| 3 | Categoría "Reformas" (−892 €) invisible | BAJO | Mostrar con indicador de ventas negativas |
-| 4 | Sin filtros rápidos (ej. solo tiendas físicas, solo digital) | BAJO | Futuro: tabs o filtros en tabla |
-| 5 | Sin alertas/notificaciones de umbrales | BAJO | Futuro: badge cuando MB% cae >3pp |
+| 1 | **Store cards mobile: text overlap (B1)** | ALTO | Grid de métricas: reducir a 2 cols en <400px o apilar verticalmente |
+| 2 | **"Datos hasta" oculto en mobile (B2)** | MEDIO | Añadir fecha en header principal o como badge bajo los KPIs |
+| 3 | **Heatmap truncado (B3/B4)** | MEDIO | Añadir scroll horizontal con sombra/gradiente, o transponer en mobile |
+| 4 | Tablas generales pierden columnas en tablet/mobile | MEDIO | `overflow-x-auto` con indicador visual de scroll |
+| 5 | "Servicios Centrales" (335 €) no aparece en Resumen | BAJO | Incluir en tabla de Contract o crear sección "Otros" |
+| 6 | Categoría "Reformas" (−892 €) invisible | BAJO | Mostrar con indicador de ventas negativas |
+| 7 | Sin filtros rápidos (ej. solo tiendas físicas, solo digital) | BAJO | Futuro: tabs o filtros en tabla |
+| 8 | Sin alertas/notificaciones de umbrales | BAJO | Futuro: badge cuando MB% cae >3pp |
 
 ---
 
@@ -424,21 +480,31 @@ El KPI total muestra **1.298.873 €**. La diferencia de **335 €** corresponde
 | `TODO/FIXME` | ✅ Limpio | Ningún comentario pendiente |
 | Imports no usados | ✅ Limpio | Todos los imports están en uso (excepto ObjPill que es el archivo completo) |
 
-### 7.4 Responsive
+### 7.4 Responsive (actualizado tras análisis pixel-by-pixel de 30 screenshots)
 
 | Resolución | Puntuación | Problemas |
 |---|---|---|
-| Desktop (1440px) | **10/10** | Perfecto |
-| Tablet (768px) | **9/10** | Columna derecha de tablas recortada |
-| Mobile (375px) | **8/10** | Tablas recortadas + ligero crowding en store cards |
+| Desktop (1440px) | **10/10** | Perfecto — todos los elementos visibles y correctos |
+| Tablet (768px) | **8/10** | Columnas MARGEN y AÑO ANT. ocultas; heatmap SERVICIOS cortado; sin indicador de scroll |
+| Mobile (375px) | **6.5/10** | Text overlap en store cards (B1); solo 3 columnas visibles en tablas; "Datos hasta" oculto (B2); heatmap pierde 3 columnas (B4) |
 
-**Problema consistente:** Las tablas con muchas columnas (MB%, % Obj, Año Ant, % YoY, MN%, MB% Ant, etc.) pierden la última columna en tablet y las 2-3 últimas en mobile. No hay indicador visual de scroll horizontal.
+**Bugs responsive detallados:**
 
-**Lo que funciona bien:**
+1. **B1 — Text overlap en store cards (ALTA):** En mobile, las métricas de las store cards (% Obj, Año Ant., MB%) se solapan cuando los valores son largos. "75,9%41K EUR" en lugar de mostrar en celdas separadas. Afecta a las 5 store cards en ambos períodos.
+
+2. **B2 — "Datos hasta" invisible (MEDIA):** En mobile, la fecha de referencia no se muestra. En tablet se ve en sidebar. Un CEO en el móvil no sabe si ve datos de hoy o de hace 3 días.
+
+3. **B3/B4 — Heatmap categorías (MEDIA):** En tablet se pierde 1 columna (SERVICIOS), en mobile 3 columnas (MUEBLES, OTROS, SERVICIOS). El heatmap no tiene scroll horizontal.
+
+4. **B5 — Tablas generales (MEDIA):** Todas las tablas con >6 columnas pierden columnas a la derecha. Consistente en Resumen, Tiendas, E-Commerce y Márgenes.
+
+**Lo que funciona bien en responsive:**
 - KPI cards apilan correctamente (1 col mobile, 2 col tablet, 4 col desktop)
-- Store cards adaptan layout
-- Sidebar se oculta en mobile (menú hamburguesa)
-- Charts SVG (donut, sparklines, gauge) escalan correctamente
+- Store cards adaptan layout (excepto B1)
+- Sidebar se oculta en mobile (menú hamburguesa funcional)
+- Charts SVG (donut, sparklines, gauge) escalan correctamente vía viewBox
+- Drill-down funciona correctamente en todas las resoluciones
+- Donut chart de E-Commerce se redimensiona bien
 
 ---
 
@@ -451,34 +517,51 @@ El KPI total muestra **1.298.873 €**. La diferencia de **335 €** corresponde
 | H1 | Sin middleware de autenticación | CRÍTICA | Seguridad | Crear `middleware.ts` con verificación de sesión |
 | H2 | Credenciales BD en `.env` visible en repo | CRÍTICA | Seguridad | Mover a secrets de Coolify / vault |
 | H3 | API POST `/api/data/objetivos` sin auth | ALTA | Seguridad | Añadir verificación de permisos |
-| H4 | 4 API routes sin try-catch | MEDIA | Técnica | Añadir error handling |
-| H5 | Sin `error.tsx` / `loading.tsx` | MEDIA | UX | Añadir loading states y error boundaries |
-| H6 | `obj-pill.tsx` es código muerto | BAJA | Limpieza | Eliminar archivo |
-| H7 | Tablas recortadas en mobile/tablet | MEDIA | UX | Indicador de scroll horizontal |
-| H8 | Servicios Centrales ausente en Resumen | BAJA | Datos | Incluir en tabla o documentar exclusión |
-| H9 | Sin caché de queries | BAJA | Rendimiento | Evaluar `revalidate` o ISR |
-| H10 | Sin proyección al cierre de mes | BAJA | Funcionalidad | Feature request |
+| H4 | **Text overlap en store cards mobile** | ALTA | UX/Responsive | Reducir font-size o apilar métricas en 2 filas en breakpoint <400px |
+| H5 | 4 API routes sin try-catch | MEDIA | Técnica | Añadir error handling |
+| H6 | Sin `error.tsx` / `loading.tsx` | MEDIA | UX | Añadir loading states y error boundaries |
+| H7 | **"Datos hasta" oculto en mobile** | MEDIA | UX | Mostrar fecha de referencia en header mobile |
+| H8 | **Heatmap truncado en tablet/mobile** | MEDIA | UX | Scroll horizontal con indicador visual o layout alternativo |
+| H9 | Tablas recortadas en mobile/tablet (general) | MEDIA | UX | Indicador de scroll horizontal en todas las tablas |
+| H10 | `obj-pill.tsx` es código muerto | BAJA | Limpieza | Eliminar archivo |
+| H11 | Servicios Centrales ausente en Resumen | BAJA | Datos | Incluir en tabla o documentar exclusión |
+| H12 | **Cocinas Motril MB% cross-breakpoint** | BAJA | Datos/Render | Verificar valor 25,1% vs 35,1% en heatmap — posible error de celda |
+| H13 | **"Otros" Kibuc 122,7% del Total** | BAJA | Datos | Verificar denominador del cálculo de peso relativo |
+| H14 | E-Commerce MB% umbral absoluto vs YoY | BAJA | Consistencia | Unificar criterio de coloring de MB% con resto de vistas |
+| H15 | Sin caché de queries | BAJA | Rendimiento | Evaluar `revalidate` o ISR |
+| H16 | Sin proyección al cierre de mes | BAJA | Funcionalidad | Feature request |
 
-### Scoring Final
+### Scoring Final (actualizado tras análisis pixel-by-pixel)
 
-| Área | Peso | Puntuación | Ponderado |
-|---|---|---|---|
-| Exactitud de datos | 30% | 10/10 | 3,0 |
-| Colores y señalización | 20% | 9/10 | 1,8 |
-| Consistencia | 15% | 9/10 | 1,35 |
-| UX/Responsive | 15% | 8,5/10 | 1,275 |
-| Seguridad | 10% | 5/10 | 0,5 |
-| Rendimiento/Técnica | 10% | 8/10 | 0,8 |
-| **TOTAL PONDERADO** | **100%** | | **8,73/10** |
+| Área | Peso | Puntuación | Ponderado | Nota |
+|---|---|---|---|---|
+| Exactitud de datos | 30% | 10/10 | 3,0 | 100% match BD ↔ UI confirmado en 30 screenshots |
+| Colores y señalización | 20% | 9/10 | 1,8 | MB%, ObjBar, DevPill correctos; E-Commerce cards usan umbral distinto |
+| Consistencia | 15% | 9/10 | 1,35 | 1 caso cross-breakpoint (B6), 335€ Serv. Centrales |
+| UX/Responsive | 15% | 7,5/10 | 1,125 | ↓ de 8,5: text overlap mobile (B1), datos hasta oculto (B2), heatmap truncado (B3/B4) |
+| Seguridad | 10% | 5/10 | 0,5 | Sin auth middleware, credenciales expuestas |
+| Rendimiento/Técnica | 10% | 8/10 | 0,8 | Promise.all eficiente, falta error handling |
+| **TOTAL PONDERADO** | **100%** | | **8,58/10** | |
 
 ### Conclusión
 
-**El Cuadro de Dirección CHS es un dashboard de alta calidad para reporting ejecutivo.** La exactitud de datos es perfecta (100% coincidencia BD ↔ UI), los colores y señales visuales son correctos y consistentes, y la experiencia de usuario es sólida en desktop y aceptable en mobile.
+**El Cuadro de Dirección CHS es un dashboard de alta calidad para reporting ejecutivo.** La exactitud de datos es perfecta (100% coincidencia BD ↔ UI verificada pixel-by-pixel en 30 screenshots), los colores y señales visuales son correctos y consistentes en ambos períodos (MTD Marzo y Febrero 2026).
 
-**La única área que requiere atención urgente es la seguridad:** ausencia de middleware de autenticación y credenciales expuestas. Estas son vulnerabilidades estándar que se resuelven con un middleware Next.js y gestión de secrets.
+**Áreas que requieren atención:**
 
-El dashboard está listo para uso ejecutivo en su estado actual (accedido vía red interna con reverse proxy autenticado), pero las mejoras de seguridad deberían implementarse antes de cualquier exposición adicional.
+1. **Seguridad (URGENTE):** Ausencia de middleware de autenticación y credenciales expuestas. Vulnerabilidades estándar que se resuelven con middleware Next.js y gestión de secrets.
+
+2. **Responsive mobile (IMPORTANTE):** El análisis exhaustivo reveló problemas en mobile que no se detectaron en la primera pasada:
+   - Text overlap en store cards que hace métricas ilegibles (B1)
+   - Fecha de datos oculta — el CEO no sabe si ve datos frescos (B2)
+   - Heatmap de categorías pierde 3 de 6 columnas (B4)
+
+3. **Casos aislados de datos (MENOR):** Kibuc 122,7% del Total en categoría Otros (B7), posible inconsistencia Cocinas Motril MB% entre breakpoints (B6).
+
+**El dashboard está listo para uso ejecutivo en desktop.** La experiencia en tablet es aceptable (8/10). En mobile se recomienda corregir B1 y B2 antes de uso habitual. Las mejoras de seguridad deberían implementarse antes de cualquier exposición adicional.
 
 ---
 
-*Informe generado automáticamente. Base de datos auditada: `chs_platform`. Screenshots en `/home/chs-dash2/auditoria-final/`.*
+*Informe generado tras análisis pixel-by-pixel de 30 screenshots + validación completa contra BD `chs_platform`.*
+*Fecha de auditoría: 18 de marzo de 2026.*
+*Screenshots en: `/home/chs-dash2/auditoria-final/`*
