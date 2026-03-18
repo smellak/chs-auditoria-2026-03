@@ -1,0 +1,268 @@
+============================================================
+  CHS DATABASE AUDIT QUERIES - 2026-03-18 17:39:49
+  MTD Period: 2026-03-01 to 2026-03-14
+  Anterior Period: 2025-03-01 to 2025-03-14
+============================================================
+
+------------------------------------------------------------
+QUERY 1: Total Enterprise Sales MTD
+------------------------------------------------------------
+Expanded display is off.
+Output format is aligned.
+  ventas   |   coste   |  margen   | mb_pct | dias_datos 
+-----------+-----------+-----------+--------+------------
+ 677490.67 | 446950.83 | 230539.84 |   34.0 |         12
+(1 row)
+
+
+------------------------------------------------------------
+QUERY 2: Sales by Store MTD
+------------------------------------------------------------
+Expanded display is off.
+Output format is aligned.
+       tienda        |  ventas   |  margen  | mb_pct 
+---------------------+-----------+----------+--------
+ alban               | 213345.50 | 74007.31 |   34.7
+ motril              |  81181.84 | 27014.69 |   33.3
+ juncaril            |  68810.18 | 23284.15 |   33.8
+ antequera           |  54686.91 | 19011.08 |   34.8
+ almeria             |  50173.60 | 17266.21 |   34.4
+ contract            |  39236.90 | 13538.71 |   34.5
+ kibuc_granada       |  34784.56 | 12020.56 |   34.6
+ granada             |  33129.59 | 10811.09 |   32.6
+ chs_web             |  24902.05 |  8126.32 |   32.6
+ amazon_es           |  21118.65 |  6791.43 |   32.2
+ shiito_es           |  15670.11 |  4825.59 |   30.8
+ carrefour           |  12400.72 |  4114.68 |   33.2
+ media_markt         |  10301.38 |  3610.76 |   35.1
+ servicios_centrales |   8875.06 |  3115.27 |   35.1
+ shiito_pt           |   8873.62 |  3001.99 |   33.8
+(15 rows)
+
+
+------------------------------------------------------------
+QUERY 3: Previous Year Same Period (Anterior)
+------------------------------------------------------------
+Expanded display is off.
+Output format is aligned.
+ ventas_ant | margen_ant | mb_pct_ant 
+------------+------------+------------
+  627748.39 |  213998.27 |       34.1
+(1 row)
+
+
+------------------------------------------------------------
+QUERY 4: Sales by Category MTD
+------------------------------------------------------------
+Expanded display is off.
+Output format is aligned.
+ categoria |  ventas   |  margen  | mb_pct 
+-----------+-----------+----------+--------
+ muebles   | 255281.61 | 96838.88 |   37.9
+ electro   | 177000.38 | 48480.69 |   27.4
+ cocinas   | 137474.09 | 47833.17 |   34.8
+ reformas  |  56863.94 | 17100.76 |   30.1
+ servicios |  37402.51 | 17000.02 |   45.5
+ otros     |  13468.14 |  3286.32 |   24.4
+(6 rows)
+
+
+------------------------------------------------------------
+QUERY 5: Prorated Daily Objectives by Store
+------------------------------------------------------------
+Expanded display is off.
+Output format is aligned.
+ERROR:  relation "direccion.objetivos_diario" does not exist
+LINE 2: ...LECT tienda, SUM(objetivo_venta) as objetivo FROM direccion....
+                                                             ^
+
+------------------------------------------------------------
+QUERY 6: Objective by Category
+------------------------------------------------------------
+Expanded display is off.
+Output format is aligned.
+ERROR:  relation "direccion.objetivos_diario" does not exist
+LINE 2: ...T categoria, SUM(objetivo_venta) as objetivo FROM direccion....
+                                                             ^
+
+------------------------------------------------------------
+QUERY 7: Gastos (Expenses) March 2026
+------------------------------------------------------------
+Expanded display is off.
+Output format is aligned.
+ERROR:  relation "direccion.gastos_mensual" does not exist
+LINE 2: ...ortes, comisiones, financieros, total_gastos FROM direccion....
+                                                             ^
+
+------------------------------------------------------------
+QUERY 8: E-commerce Channels MTD
+------------------------------------------------------------
+Expanded display is off.
+Output format is aligned.
+    tienda     |  ventas  |  margen  | mb_pct 
+---------------+----------+----------+--------
+ kibuc_granada | 34784.56 | 12020.56 |   34.6
+ chs_web       | 24902.05 |  8126.32 |   32.6
+ amazon_es     | 21118.65 |  6791.43 |   32.2
+ shiito_es     | 15670.11 |  4825.59 |   30.8
+ carrefour     | 12400.72 |  4114.68 |   33.2
+ media_markt   | 10301.38 |  3610.76 |   35.1
+(6 rows)
+
+
+------------------------------------------------------------
+QUERY 9: MB% Actual vs Anterior by Store (Color Verification)
+------------------------------------------------------------
+Expanded display is off.
+Output format is aligned.
+       tienda        | mb_pct | mb_pct_ant | color_esperado 
+---------------------+--------+------------+----------------
+ alban               |   34.7 |       34.0 | VERDE
+ almeria             |   34.4 |       34.3 | VERDE
+ amazon_es           |   32.2 |       38.4 | ROJO
+ antequera           |   34.8 |       34.2 | VERDE
+ carrefour           |   33.2 |       30.9 | VERDE
+ chs_web             |   32.6 |       36.8 | ROJO
+ contract            |   34.5 |       34.6 | ROJO
+ granada             |   32.6 |       33.8 | ROJO
+ juncaril            |   33.8 |       33.1 | VERDE
+ kibuc_granada       |   34.6 |       34.8 | ROJO
+ media_markt         |   35.1 |       36.9 | ROJO
+ motril              |   33.3 |       34.6 | ROJO
+ servicios_centrales |   35.1 |       31.6 | VERDE
+ shiito_es           |   30.8 |       33.7 | ROJO
+ shiito_pt           |   33.8 |       33.1 | VERDE
+(15 rows)
+
+
+------------------------------------------------------------
+QUERY 10: Previous Year Sales by Store (for YoY)
+------------------------------------------------------------
+Expanded display is off.
+Output format is aligned.
+       tienda        | ventas_ant 
+---------------------+------------
+ alban               |  198346.70
+ almeria             |   52172.95
+ amazon_es           |    7110.43
+ antequera           |   44018.28
+ carrefour           |   11318.75
+ chs_web             |   24270.73
+ contract            |   27395.79
+ granada             |   43897.64
+ juncaril            |   68384.44
+ kibuc_granada       |   25560.56
+ media_markt         |    6109.87
+ motril              |   74232.14
+ servicios_centrales |   16212.88
+ shiito_es           |   20501.24
+ shiito_pt           |    8215.99
+(15 rows)
+
+
+------------------------------------------------------------
+QUERY 11: MB% Actual vs Anterior by Category (Color Verification)
+------------------------------------------------------------
+Expanded display is off.
+Output format is aligned.
+ categoria | mb_pct | mb_pct_ant | color_esperado 
+-----------+--------+------------+----------------
+ cocinas   |   34.8 |       34.4 | VERDE
+ electro   |   27.4 |       27.0 | VERDE
+ muebles   |   37.9 |       38.2 | ROJO
+ otros     |   24.4 |       24.8 | ROJO
+ reformas  |   30.1 |       29.8 | VERDE
+ servicios |   45.5 |       45.4 | VERDE
+(6 rows)
+
+
+============================================================
+  ALL 11 QUERIES COMPLETED SUCCESSFULLY
+  Results saved to: /home/chs-dash2/auditoria-final/db-queries.txt
+============================================================
+
+============================================================
+  CORRECTED QUERIES 5, 6, 7 - Table Discovery
+============================================================
+
+NOTE: The tables 'direccion.objetivos_diario' and 'direccion.gastos_mensual'
+do NOT exist in the database. Available tables in schema 'direccion':
+  - categorias
+  - cuadro_mando
+  - historico_anual
+  - objetivos
+  - subfamilias
+  - tiendas
+
+The 'objetivos' table uses (anio, mes, canal, categoria) structure
+but only has data for 2025-07. No data exists for 2026-03.
+No gastos/expenses table exists in the database.
+
+------------------------------------------------------------
+QUERY 5 (CORRECTED): Objectives from direccion.objetivos
+------------------------------------------------------------
+Expanded display is off.
+Output format is aligned.
+ tienda | objetivo_ventas | objetivo_margen 
+--------+-----------------+-----------------
+(0 rows)
+
+
+------------------------------------------------------------
+QUERY 6 (CORRECTED): Objectives by Category from direccion.objetivos
+------------------------------------------------------------
+Expanded display is off.
+Output format is aligned.
+ categoria | objetivo_ventas | objetivo_margen 
+-----------+-----------------+-----------------
+(0 rows)
+
+
+------------------------------------------------------------
+QUERY 5-ALT: Latest available objectives (2025-07) for reference
+------------------------------------------------------------
+Expanded display is off.
+Output format is aligned.
+    tienda    | categoria | objetivo_ventas | objetivo_margen 
+--------------+-----------+-----------------+-----------------
+ empresa      | total     |      1228405.00 |       311926.00
+ empresa      | electro   |       510137.00 |        86759.00
+ alban        | total     |       438420.00 |       122185.00
+ empresa      | muebles   |       417168.00 |       150361.00
+ alban        | electro   |       218000.00 |        37060.00
+ alban        | muebles   |       160000.00 |        57600.00
+ marketplaces | total     |       142593.00 |        39398.00
+ juncaril     | total     |       138402.00 |        35154.00
+ motril       | total     |       135820.00 |        34605.00
+ antequera    | total     |       121441.00 |        30111.00
+ almeria      | total     |        99867.00 |        25399.00
+ motril       | electro   |        68000.00 |        11560.00
+ contract     | total     |        66407.00 |         5007.00
+ juncaril     | electro   |        65000.00 |        11050.00
+ empresa      | cocinas   |        60918.00 |        21918.00
+ alban        | cocinas   |        60420.00 |        27525.00
+ antequera    | electro   |        58000.00 |         9860.00
+ juncaril     | muebles   |        55000.00 |        19800.00
+ chs_web      | total     |        54272.00 |        11586.00
+ motril       | muebles   |        52000.00 |        18720.00
+ antequera    | muebles   |        48000.00 |        17280.00
+ almeria      | electro   |        48000.00 |         8160.00
+ almeria      | muebles   |        38000.00 |        13680.00
+ shiito_es    | total     |        31182.00 |         8482.00
+ juncaril     | cocinas   |        18402.00 |         4304.00
+ motril       | cocinas   |        15820.00 |         4325.00
+ antequera    | cocinas   |        15441.00 |         2971.00
+ almeria      | cocinas   |        13867.00 |         3559.00
+ shiito_pt    | total     |            0.00 |            0.00
+(29 rows)
+
+
+------------------------------------------------------------
+QUERY 7 NOTE: No gastos_mensual table exists in the database
+Expenses (portes, comisiones, financieros) are likely
+computed at the application layer, not stored in DB.
+------------------------------------------------------------
+
+============================================================
+  AUDIT COMPLETE
+============================================================
